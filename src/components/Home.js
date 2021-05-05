@@ -10,17 +10,17 @@ function Home(props) {
   var searchKeyWord ="";
 
  const search = (e) => {
-   //searchKeyWord = e.target.name.value + e.target.street.value + e.target.city.value + e.target.state.value + e.target.zip.value;
+   searchKeyWord = e.target.name.value + e.target.street.value + e.target.city.value + e.target.state.value + e.target.zip.value;
     api.search(e.target.name.value, e.target.street.value, e.target.city.value, e.target.state.value, e.target.zip.value)
     .then(() => console.log("the search was successfully"))
     .catch(e => console.log(e));
-    /*let x = placeList.filter(place => place.address.includes(searchKeyWord));
-    setSearchResult(x);*/
+    let x = placeList.filter(place => place.address.includes(searchKeyWord));
+    setSearchResult(x);
     e.target.name.value ="";
-     e.target.street.value="";
-     e.target.city.value="";
-      e.target.state.value="";
-       e.target.zip.value="";
+    e.target.street.value="";
+    e.target.city.value="";
+    e.target.state.value="";
+    e.target.zip.value="";
 
    
   };

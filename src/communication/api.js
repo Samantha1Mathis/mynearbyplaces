@@ -1,5 +1,5 @@
-//let apiHost = "https://samantha1mathis-mynearbyplaces.herokuapp.com"
-let apiHost = "http://localhost:4002"
+let apiHost = "https://samantha1mathis-mynearbyplaces.herokuapp.com"
+
 let getPlaces = () => {
     return fetch(apiHost + '/places')
     .then(response => response.json());
@@ -16,8 +16,6 @@ let addReview = (place, name, comment, rating) =>{
 }
 
 let search = (name, street, city, state, zip) => {
-    console.log("hereee")
-    
     return fetch(apiHost +'/search/' + name + '/' + street +'/' +city+'/'+state+'/'+zip)
     .then(response => response.json());
 }

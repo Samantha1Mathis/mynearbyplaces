@@ -6,14 +6,6 @@ import placeList from "./places";
 import reviewList from "./reviews";
 
 function AddPlaces(props){
-
-    /*useEffect(() => {
-      if (places.length === 0) {
-        api.getPlaces()
-        .then(x => setplaces(x))
-        .catch(e => console.log(e));
-      }
-    })*/
     let username = props.username.split("@")[0];
     const [places, setplaces] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -35,7 +27,6 @@ function AddPlaces(props){
           city: e.target.city.value,
           state: e.target.state.value,
           zip: e.target.zip.value,
-          //address: e.target.address.value,
         };
         setplaces([...places, newplace]);
         placeList.push(newplace);
