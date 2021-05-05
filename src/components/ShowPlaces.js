@@ -3,6 +3,7 @@ import Card from 'react-bootstrap/Card';
 import placeList from "./places";
 import reviewList from "./reviews";
 import { useState } from 'react';
+import api from "../communication/api";
 
 function ShowPlaces(props){
     const [reviews, setReviews] = useState([]);
@@ -14,6 +15,7 @@ function ShowPlaces(props){
         const newReview = {
           id: Math.random().toString(36).substr(2, 9),
           text: e.target.review.value,
+          rating: e.target.rating.value,
           placeId: placeId,
         };
         setReviews([...reviews, newReview]);
@@ -31,7 +33,11 @@ function ShowPlaces(props){
         for (let j = count; count < placeList.length;j++){
             placeList.splice(j, 1);
         }
-    };
+        api.deletePlace(idToDelete)
+        .then(() => {console.log(`The place ${idToDelete} was added successfully`);
+        })
+        .catch(e => {console.log(e);});
+      }
 
     function deleteReview(idToDelete){
         const filteredReviews = reviewList.filter((review) => review.id !== idToDelete);
@@ -81,6 +87,7 @@ function ShowPlaces(props){
     <Card.Title>Reviews</Card.Title>
     <form onSubmit={(e) => addReview(e, place.id)}>
                 <input type="text" name="review" />
+                <input type="text" name="rating" />
                 <input type="Submit" />
         </form>
     {reviewList.filter(review => review.placeId === place.id).map((review) => (
@@ -98,7 +105,10 @@ function ShowPlaces(props){
     <input type="text" name="place" defaultValue={place.text}></input>
     <br></br>
     Address:
-    <input type="text" name="address" defaultValue={place.address}></input>
+    <input type="text" name="street" defaultValue={place.street}></input>
+    <input type="text" name="city" defaultValue={place.city}></input>
+    <input type="text" name="state" defaultValue={place.state}></input>
+    <input type="text" name="zip" defaultValue={place.zip}></input>
     <br></br>
     <button type="Submit"> Submit Edits</button>
   </form>

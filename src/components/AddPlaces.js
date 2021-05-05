@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.css';
-import { useState } from 'react';
+import {useState, useEffect} from 'react';
+import api from "../communication/api";
 import Card from 'react-bootstrap/Card';
 import placeList from "./places";
 import reviewList from "./reviews";
@@ -7,6 +8,13 @@ import reviewList from "./reviews";
 function AddPlaces(props){
 
     const [places, setplaces] = useState([]);
+    useEffect(() => {
+      if (places.length === 0) {
+        api.getPlaces()
+        .then(x => setplaces(x))
+        .catch(e => console.log(e));
+      }
+    })
     const [reviews, setReviews] = useState([]);
 
     const addplace = (e) => {
@@ -14,12 +22,22 @@ function AddPlaces(props){
         const newplace = {
           id: Math.random().toString(36).substr(2, 9),
           text: e.target.place.value,
-          address: e.target.address.value,
+          street: e.target.street.value,
+          city: e.target.city.value,
+          state: e.target.state.value,
+          zip: e.target.zip.value,
+          //address: e.target.address.value,
         };
         setplaces([...places, newplace]);
         placeList.push(newplace);
+        api.addPlace(newplace.text, newplace.street, newplace.city, newplace.state, newplace.zip)
+        .then(() => console.log("the restaurant was added successfully"))
+        .catch(e => console.log(e));
         e.target.place.value = "";
-        e.target.address.value = "";
+        e.target.street.value = "";
+        e.target.city.value = "";
+        e.target.state.value = "";
+        e.target.zip.value = "";
       }
 
     function addReview(e, placeId){
@@ -28,6 +46,7 @@ function AddPlaces(props){
           id: Math.random().toString(36).substr(2, 9),
           text: e.target.review.value,
           placeId: placeId,
+
         };
         setReviews([...reviews, newReview]);
         reviewList.push(newReview);
@@ -44,7 +63,10 @@ function AddPlaces(props){
           <div>
             <form onSubmit={addplace}>
                 <input type="text" placeholder="restaurant" name="place" />
-                <input type="text" placeholder="address" name="address" />
+                <input type="text" placeholder="Street" name="street" />
+                <input type="text" placeholder="city" name="city" />
+                <input type="text" placeholder="state" name="state" />
+                <input type="text" placeholder="zip" name="zip" />
                 <input type="Submit" value="Add Restaurant"/>
             </form>
 
@@ -55,7 +77,7 @@ function AddPlaces(props){
         </Card.Header>
 
         <Card.Body>
-        Address: {place.address}
+        Address: {place.street} {place.city} {place.state} {place.zip}
         <Card.Title>Reviews</Card.Title>
         
         <form onSubmit={(e) => addReview(e, place.id)}>
