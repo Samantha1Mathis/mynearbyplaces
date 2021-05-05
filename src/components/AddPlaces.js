@@ -2,8 +2,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import {useState, useEffect} from 'react';
 import api from "../communication/api";
 import Card from 'react-bootstrap/Card';
-import placeList from "./places";
-import reviewList from "./reviews";
+//import placeList from "./places";
+//import reviewList from "./reviews";
 
 function AddPlaces(props){
     let username = props.username.split("@")[0];
@@ -28,11 +28,12 @@ function AddPlaces(props){
           state: e.target.state.value,
           zip: e.target.zip.value,
         };
-        setplaces([...places, newplace]);
-        placeList.push(newplace);
+        
+        //placeList.push(newplace);
         api.addPlace(newplace.text, newplace.street, newplace.city, newplace.state, newplace.zip)
-        .then(() => console.log("the restaurant was added successfully"))
+        .then(() => {setplaces([...places, newplace]); console.log("the restaurant was added successfully");})
         .catch(e => console.log(e));
+
         e.target.place.value = "";
         e.target.street.value = "";
         e.target.city.value = "";
@@ -51,10 +52,10 @@ function AddPlaces(props){
         };
 
         api.addReview(placeName, username, newReview.text, newReview.rating)
-        .then(() => console.log("the review was added successfully"))
+        .then(() => {setReviews([...reviews, newReview]); console.log("the review was added successfully");})
         .catch(e => console.log(e));
-        setReviews([...reviews, newReview]);
-        reviewList.push(newReview);
+        
+        //reviewList.push(newReview);
         e.target.review.value = "";
         e.target.rating.value = "";
       }

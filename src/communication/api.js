@@ -16,7 +16,7 @@ let addReview = (place, name, comment, rating) =>{
 }
 
 let search = (name, street, city, state, zip) => {
-    return fetch(apiHost +'/search/' + name + '/' + street +'/' +city+'/'+state+'/'+zip)
+    return fetch(apiHost +'/search?name=' + name + '&street=' + street +'&city=' +city+'&state='+state+'&zip='+zip)
     .then(response => response.json());
 }
 
