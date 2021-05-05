@@ -2,15 +2,24 @@ import 'bootstrap/dist/css/bootstrap.css';
 import Card from 'react-bootstrap/Card';
 import placeList from "./places";
 import reviewList from "./reviews";
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import api from "../communication/api";
 
 function ShowPlaces(props){
     const [reviews, setReviews] = useState([]);
     const [places, setplaces] = useState([]);
     const [placeEditing, setplaceEditing] = useState("");
+    let username = props.username.split("@")[0];
 
-    function addReview(e, placeId){
+    useEffect(() => {
+      if(places.length === 0) {
+          api.getPlaces()
+          .then(x => setplaces(x))
+          .catch(e => console.log(e));
+      }
+  });
+
+    function addReview(e, placeId, placeName){
         e.preventDefault();
         const newReview = {
           id: Math.random().toString(36).substr(2, 9),
@@ -20,9 +29,13 @@ function ShowPlaces(props){
         };
         setReviews([...reviews, newReview]);
         reviewList.push(newReview);
+        api.addReview(placeName, username, newReview.text, newReview.rating)
+        .then(() => console.log("the review was added successfully"))
+        .catch(e => console.log(e));
         e.target.review.value = "";
+        e.target.rating.value = "";
       }
-      const deleteplace = (idToDelete) => {
+      const deleteplace = (idToDelete, placeName, street, city, state, zip) => {
         const filteredplaces = placeList.filter((place) => place.id !== idToDelete);
         setplaces(filteredplaces);
         let count = 0;
@@ -33,13 +46,12 @@ function ShowPlaces(props){
         for (let j = count; count < placeList.length;j++){
             placeList.splice(j, 1);
         }
-        api.deletePlace(idToDelete)
-        .then(() => {console.log(`The place ${idToDelete} was added successfully`);
-        })
-        .catch(e => {console.log(e);});
+        api.deletePlace(placeName, street, city, state, zip)
+        .then(() => console.log("The place was deleted successfully"))
+        .catch(e => console.log(e));
       }
 
-    function deleteReview(idToDelete){
+    function deleteReview(idToDelete, reviewText, rating){
         const filteredReviews = reviewList.filter((review) => review.id !== idToDelete);
         setReviews(filteredReviews);
         let count = 0;
@@ -50,15 +62,21 @@ function ShowPlaces(props){
         for (let j = count; count < reviewList.length;j++){
             reviewList.splice(j, 1);
         }
+        api.deleteReview(reviewText, rating, username)
+        .then(() => console.log("the review was deleted successfully"))
+        .catch(e => console.log(e));
     };
-    const submitEdits = (event, idToEdit) => {
+    const submitEdits = (event, idToEdit, placeName, street, city, state, zip) => {
         event.preventDefault();
         const updatedplaces = placeList.map((place) => {
           if (place.id === idToEdit) {
             return {
               id: place.id,
               text: event.target.place.value,
-              address: event.target.address.value,
+              street: event.target.street.value,
+              city: event.target.city.value,
+              state: event.target.state.value,
+              zip: event.target.zip.value,
             };
           } else {
             return place;
@@ -69,6 +87,11 @@ function ShowPlaces(props){
         }
         setplaces(updatedplaces);
         setplaceEditing("");
+        let oldAdd = {placeName:placeName, street:street, city:city, state:state, zip:parseInt(zip)};
+        let newAdd = {placeName:event.target.place.value, street:event.target.street.value, city:event.target.city.value, state:event.target.state.value, zip:parseInt(event.target.zip.value)};
+        api.updatePlace(oldAdd, newAdd)
+        .then(() => console.log("the place was updated successfully"))
+        .catch(e => console.log(e));
       };
       return (
         <div>
@@ -78,14 +101,14 @@ function ShowPlaces(props){
           {place.id !== placeEditing ? (
     <Card id={place.id} style={{ width: '750px' }}>
     <Card.Header as="h5">{place.text} 
-    <button onClick={() => deleteplace(place.id)}>delete</button>
+    <button onClick={() => deleteplace(place.id, place.text, place.street, place.city, place.state, place.zip)}>delete</button>
     <button onClick={() => setplaceEditing(place.id)}>edit</button>
     </Card.Header>
 
     <Card.Body>
     Address: {place.address}
     <Card.Title>Reviews</Card.Title>
-    <form onSubmit={(e) => addReview(e, place.id)}>
+    <form onSubmit={(e) => addReview(e, place.id, place.text)}>
                 <input type="text" name="review" />
                 <input type="text" name="rating" />
                 <input type="Submit" />
@@ -94,13 +117,13 @@ function ShowPlaces(props){
         
     <div key={review.id}>
   <div>{review.text}</div>
-    <button onClick={() => deleteReview(review.id)}>delete</button>
+    <button onClick={() => deleteReview(review.id, review.text, review.rating)}>delete</button>
     </div>
 ))}
     </Card.Body>
     </Card>
   ) : (
-  <form onSubmit={(e) => submitEdits(e, place.id)}>
+  <form onSubmit={(e) => submitEdits(e, place.id, place.text, place.street, place.city, place.state, place.zip)}>
     Restaurant Name:
     <input type="text" name="place" defaultValue={place.text}></input>
     <br></br>

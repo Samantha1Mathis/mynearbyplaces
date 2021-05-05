@@ -3,16 +3,26 @@ import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import placeList from "./places";
 import reviewList from "./reviews";
+import api from "../communication/api";
 
 function Home(props) {
   const [searchResult, setSearchResult] = useState([]);
   var searchKeyWord ="";
 
  const search = (e) => {
-    searchKeyWord = e.target.search.value;
-    let x = placeList.filter(place => place.address.includes(searchKeyWord));
-    setSearchResult(x);
-    e.target.search.value = "";
+   //searchKeyWord = e.target.name.value + e.target.street.value + e.target.city.value + e.target.state.value + e.target.zip.value;
+    api.search(e.target.name.value, e.target.street.value, e.target.city.value, e.target.state.value, e.target.zip.value)
+    .then(() => console.log("the search was successfully"))
+    .catch(e => console.log(e));
+    /*let x = placeList.filter(place => place.address.includes(searchKeyWord));
+    setSearchResult(x);*/
+    e.target.name.value ="";
+     e.target.street.value="";
+     e.target.city.value="";
+      e.target.state.value="";
+       e.target.zip.value="";
+
+   
   };
 
 
@@ -21,7 +31,11 @@ function Home(props) {
 
             <h2 style={{ textAlign: "center" }}>Home Page</h2>
             <form onSubmit={search}>
-                <input type="text" placeholder="address" name="search" />
+                <input type="text" placeholder="name" name="name" />
+                <input type="text" placeholder="street" name="street" />
+                <input type="text" placeholder="city" name="city" />
+                <input type="text" placeholder="state" name="state" />
+                <input type="text" placeholder="zip" name="zip" />
                 <input type="Submit" value="Search"/>
             </form>
             {searchResult.map(place => 

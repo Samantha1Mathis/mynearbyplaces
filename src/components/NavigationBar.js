@@ -13,6 +13,12 @@ function NavigationBar(props){
                     <Nav.Link><Link className="link" to="/">Home</Link></Nav.Link>
                     <Nav.Link><Link className="link" to="/addPlaces">Add the Place</Link></Nav.Link>
                     <Nav.Link><Link className="link" to="/showPlaces">Display Places</Link></Nav.Link>
+                    <Nav.Link>{props.username === '' ?
+                    <Link className='link' to="/login">Login</Link>
+                    :
+                    <Link className='link' to="/login">{props.username}, Logout</Link>
+                     }
+            </Nav.Link>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>

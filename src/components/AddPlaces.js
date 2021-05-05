@@ -7,15 +7,24 @@ import reviewList from "./reviews";
 
 function AddPlaces(props){
 
-    const [places, setplaces] = useState([]);
-    useEffect(() => {
+    /*useEffect(() => {
       if (places.length === 0) {
         api.getPlaces()
         .then(x => setplaces(x))
         .catch(e => console.log(e));
       }
-    })
+    })*/
+    let username = props.username.split("@")[0];
+    const [places, setplaces] = useState([]);
     const [reviews, setReviews] = useState([]);
+
+    useEffect(() => {
+      if(places.length === 0) {
+          api.getPlaces()
+          .then(x => setplaces(x))
+          .catch(e => console.log(e));
+      }
+  });
 
     const addplace = (e) => {
         e.preventDefault();
@@ -40,25 +49,25 @@ function AddPlaces(props){
         e.target.zip.value = "";
       }
 
-    function addReview(e, placeId){
+    function addReview(e, placeId, placeName){
         e.preventDefault();
         const newReview = {
           id: Math.random().toString(36).substr(2, 9),
           text: e.target.review.value,
+          rating: e.target.rating.value,
           placeId: placeId,
 
         };
+
+        api.addReview(placeName, username, newReview.text, newReview.rating)
+        .then(() => console.log("the review was added successfully"))
+        .catch(e => console.log(e));
         setReviews([...reviews, newReview]);
         reviewList.push(newReview);
         e.target.review.value = "";
+        e.target.rating.value = "";
       }
 
-    function deleteReview(idToDelete){
-        const filteredReviews = reviews.filter((review) => review.id !== idToDelete);
-        setReviews(filteredReviews);
-        let index = reviewList.indexOf(filteredReviews[0].id);
-        reviewList.splice(index, 1);
-    };
       return (
           <div>
             <form onSubmit={addplace}>
@@ -80,25 +89,25 @@ function AddPlaces(props){
         Address: {place.street} {place.city} {place.state} {place.zip}
         <Card.Title>Reviews</Card.Title>
         
-        <form onSubmit={(e) => addReview(e, place.id)}>
+        <form onSubmit={(e) => addReview(e, place.id, place.text)}>
                 <input type="text" name="review" />
+                <input type="text" name="rating" />
                 <input type="Submit" />
         </form>
         {reviews.filter(review => review.placeId === place.id).map((review) => (
             
         <div key={review.id}>
       <div>{review.text}</div>
-        <button onClick={() => deleteReview(review.id)}>delete</button>
         </div>
     ))}
         </Card.Body>
         </Card>
   </div>
 ))}
-        </div>
+       </div>
 
 
-      )
-}
+     )
+      }
 
 export default AddPlaces;
